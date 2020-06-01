@@ -26,6 +26,9 @@ class CImage {
 public:
     CImage(SInput config);
 
+    void settingUpOfBrightntess(SInput config);
+
+
 private:
     FILE *file;
     int version;
@@ -34,6 +37,13 @@ private:
     int max_val;
     int size;
     RGB *pix;
+    bool colorSpace;
+
+    void userMode(double offset, double multilier);
+
+    void autoMode(SInput config);
+
+    int cut(double x);
 };
 
 

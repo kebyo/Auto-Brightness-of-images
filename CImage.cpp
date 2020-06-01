@@ -33,6 +33,48 @@ CImage::CImage(SInput config) {
     } else {
         throw CExpension("Wrong version of file", f);
     }
+    colorSpace = (config.mode == 0 || config.mode == 2 || config.mode == 4);
     delete[] buffer;
     fclose(f);
+}
+
+void CImage::settingUpOfBrightntess(SInput config) {
+    if (config.mode == 0 || config.mode == 1) {
+        autoMode(config);
+    } else {
+        userMode(config.offset, config.multiplier);
+    }
+}
+
+void CImage::userMode(double offset, double multilier) {
+    if (version == 5) {
+        for (int i = 0; i < size; i++) {
+            int newValue = cut((pix[i].red - offset) * multilier);
+            pix[i].red = newValue;
+            pix[i].green = newValue;
+            pix[i].blue = newValue;
+        }
+    } else {
+        if (colorSpace) {
+            for (int i = 0; i < size; i++) {
+                int newRed = cut((pix[i].red - offset) * multilier);
+                pix[i].red = newRed;
+                int newGreen = cut((pix[i].green - offset) * multilier);
+                pix[i].green = newGreen;
+                int newBlue = cut((pix[i].blue - offset) * multilier);
+                pix[i].blue = newBlue;
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                int newValue = cut((pix[i].red - offset) * multilier);
+                pix[i].red = newValue;
+            }
+        }
+    }
+}
+
+int CImage::cut(double x) {
+    x = x > 255 ? 255 : x;
+    x = x < 0 ? 0 : x;
+    return x;
 }

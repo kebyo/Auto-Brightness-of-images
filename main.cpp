@@ -26,21 +26,22 @@ int main(int argc, char *argv[]) {
                     break;
                 case 4:
                     input.offset = atoi(argv[i]);
-                    if (input.offset < -255 || input.offset > 255){
+                    if (input.offset < -255 || input.offset > 255) {
                         throw CExpension("Wrong offset");
                     }
                     break;
                 case 5:
                     input.multiplier = atof(argv[i]);
-                    if (input.multiplier < 1.0/255.0 || input.multiplier > 255.0){
+                    if (input.multiplier < 1.0 / 255.0 || input.multiplier > 255.0) {
                         throw CExpension("Wrong multiplier");
                     }
             }
         }
-        if ((input.mode == 0 || input.mode == 1) && argc != 6){
+        if ((input.mode == 0 || input.mode == 1) && argc != 6) {
             throw CExpension("Wrong amount of arguments");
         }
-
+        CImage image(input);
+        image.settingUpOfBrightntess(input);
     } catch (CExpension &expension) {
         cerr << expension.getError();
         if (expension.getFile()) {
