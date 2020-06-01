@@ -7,6 +7,9 @@
 
 #include <iostream>
 #include "CException.h"
+#include <climits>
+#include <algorithm>
+#include <vector>
 
 struct SInput {
     char *inputName;
@@ -14,6 +17,11 @@ struct SInput {
     int mode;
     int offset;
     double multiplier;
+};
+
+struct SMinMax {
+    int min;
+    int max;
 };
 
 struct RGB {
@@ -40,15 +48,17 @@ private:
     RGB *pix;
     bool colorSpace;
 
+    int getFirstD(int  i, vector<int> p);
+
+    int getFirstB(int  i, vector<int> p);
+
     void userMode(double offset, double multilier);
 
     void autoMode(SInput config);
 
     double cut(double x);
 
-    int getMin();
-
-    int getMax();
+    SMinMax getDarkestAndBrightest(bool is0039);
 };
 
 

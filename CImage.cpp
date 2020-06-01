@@ -100,16 +100,12 @@ void CImage::userMode(double offset, double multilier) {
 }
 
 void CImage::autoMode(SInput config) {
-    int min = 0;
-    int max = 255;
-    if (config.mode == 4 || config.mode == 5) {
-        min = getMin();
-        max = getMax();
-    }
-    std::cout << min << " " << 255.0 / (max - min) << "\n";
+    SMinMax tmp;
+    tmp = getDarkestAndBrightest(config.mode == 4 || config.mode == 5);
+    std::cout << tmp.min << " " << 255.0 / (tmp.max - tmp.min) << "\n";
     if (version == 5) {
         for (int i = 0; i < size; i++) {
-            int newValue = cut((pix[i].red - min) * 255.0 / (max - min));
+            int newValue = cut((pix[i].red - tmp.min) * 255.0 / (tmp.max - tmp.min));
             pix[i].red = newValue;
             pix[i].green = newValue;
             pix[i].blue = newValue;
@@ -117,25 +113,84 @@ void CImage::autoMode(SInput config) {
     } else {
         if (colorSpace) {
             for (int i = 0; i < size; i++) {
-                int newRed = cut((pix[i].red - min) * 255.0 / (max - min));
+                int newRed = cut((pix[i].red - tmp.min) * 255.0 / (tmp.max - tmp.min));
                 pix[i].red = newRed;
-                int newGreen = cut((pix[i].green - min) * 255.0 / (max - min));
+                int newGreen = cut((pix[i].green - tmp.min) * 255.0 / (tmp.max - tmp.min));
                 pix[i].green = newGreen;
-                int newBlue = cut((pix[i].blue - min) * 255.0 / (max - min));
+                int newBlue = cut((pix[i].blue - tmp.min) * 255.0 / (tmp.max - tmp.min));
                 pix[i].blue = newBlue;
             }
         } else {
             for (int i = 0; i < size; i++) {
-                int newValue = cut((pix[i].red - min) * 255.0 / (max - min));
+                int newValue = cut((pix[i].red - tmp.min) * 255.0 / (tmp.max - tmp.min));
                 pix[i].red = newValue;
             }
         }
     }
 }
 
-int CImage::getMax() {}
+SMinMax CImage::getDarkestAndBrightest(bool is0039) {
+    vector<int> p(256, 0);
+    SMinMax tmp;
+    tmp.min = 0;
+    tmp.max = 255;
+    for (int i = 0; i < size; i++) {
+        if (version == 5 && colorSpace) {
+            p[pix[i].red]++;
+            p[pix[i].green]++;
+            p[pix[i].blue]++;
+        } else {
+            p[pix[i].red]++;
+        }
+    }
+    if (is0039) {
+        int bright = 255;
+        int dark = 0;
+        int j = size * 0.0039;
+        if (version == 5 && colorSpace) {
+            size *= 3;
+        }
+        int i = 0;
+        while (i < j) {
+            if (i % 2 == 0) {
+                i = getFirstD(i, p);
+                p[i]--;
+                i++;
+                continue;
+            }
+            i = getFirstB(i, p);
+            p[i]--;
+            i++;
 
-int CImage::getMin() {}
+        }
+        bool flagB = false, flagD = false;
+        for (int i = 0; i < p.size(); i++) {
+            if (p[i] > 0 && !flagD) {
+                tmp.min = i;
+                flagD = true;
+            }
+            if (p[255 - i] > 0 && !flagB) {
+                tmp.max = 255 - i;
+                flagB = true;
+            }
+        }
+    }
+    return tmp;
+}
+
+int CImage::getFirstD(int i, vector<int> p) {
+    while (p[i] == 0) {
+        i++;
+    }
+    return i;
+}
+
+int CImage::getFirstB(int i, vector<int> p) {
+    while (p[i] == 0) {
+        i--;
+    }
+    return i;
+}
 
 double CImage::cut(double x) {
     x = x > 255.0 ? 255.0 : x;

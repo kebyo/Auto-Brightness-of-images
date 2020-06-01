@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
         }
         CImage image(input);
         image.settingUpOfBrightntess(input);
+        image.writeToFile(input.outputName);
     } catch (CExpension &expension) {
         cerr << expension.getError();
         if (expension.getFile()) {
@@ -50,4 +51,8 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     return 0;
+}
+
+int CImage::getMax() {
+    for (int i = 0; i <)
 }
