@@ -43,7 +43,11 @@ private:
 
     void autoMode(SInput config);
 
-    int cut(double x);
+    double cut(double x);
+
+    int getMin();
+
+    int getMax();
 };
 
 

@@ -40,9 +40,9 @@ CImage::CImage(SInput config) {
 
 void CImage::settingUpOfBrightntess(SInput config) {
     if (config.mode == 0 || config.mode == 1) {
-        autoMode(config);
-    } else {
         userMode(config.offset, config.multiplier);
+    } else {
+        autoMode(config);
     }
 }
 
@@ -73,8 +73,46 @@ void CImage::userMode(double offset, double multilier) {
     }
 }
 
-int CImage::cut(double x) {
-    x = x > 255 ? 255 : x;
-    x = x < 0 ? 0 : x;
+void CImage::autoMode(SInput config) {
+    int min = 0;
+    int max = 255;
+    if (config.mode == 4 || config.mode == 5) {
+        min = getMin();
+        max = getMax();
+    }
+    std::cout << min << " " << 255.0 * (max - min) << "\n";
+    if (version == 5) {
+        for (int i = 0; i < size; i++) {
+            int newValue = cut((pix[i].red - min) * 255.0 / (max - min));
+            pix[i].red = newValue;
+            pix[i].green = newValue;
+            pix[i].blue = newValue;
+        }
+    } else {
+        if (colorSpace) {
+            for (int i = 0; i < size; i++) {
+                int newRed = cut((pix[i].red - min) * 255.0 / (max - min));
+                pix[i].red = newRed;
+                int newGreen = cut((pix[i].green - min) * 255.0 / (max - min));
+                pix[i].green = newGreen;
+                int newBlue = cut((pix[i].blue - min) * 255.0 / (max - min));
+                pix[i].blue = newBlue;
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                int newValue = cut((pix[i].red - min) * 255.0 / (max - min));
+                pix[i].red = newValue;
+            }
+        }
+    }
+}
+
+int CImage::getMax() {}
+
+int CImage::getMin() {}
+
+double CImage::cut(double x) {
+    x = x > 255.0 ? 255.0 : x;
+    x = x < 0.0 ? 0.0 : x;
     return x;
 }
