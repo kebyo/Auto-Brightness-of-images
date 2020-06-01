@@ -48,9 +48,9 @@ private:
     RGB *pix;
     bool colorSpace;
 
-    int getFirstD(int  i, vector<int> p);
+    int getFirstD(int  i, vector<int> &p);
 
-    int getFirstB(int  i, vector<int> p);
+    int getFirstB(int  i, vector<int> &p);
 
     void userMode(double offset, double multilier);
 

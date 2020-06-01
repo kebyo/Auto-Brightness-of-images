@@ -135,7 +135,7 @@ SMinMax CImage::getDarkestAndBrightest(bool is0039) {
     tmp.min = 0;
     tmp.max = 255;
     for (int i = 0; i < size; i++) {
-        if (version == 5 && colorSpace) {
+        if (version == 6 && colorSpace) {
             p[pix[i].red]++;
             p[pix[i].green]++;
             p[pix[i].blue]++;
@@ -144,20 +144,21 @@ SMinMax CImage::getDarkestAndBrightest(bool is0039) {
         }
     }
     if (is0039) {
+        int bright = 0, dark = 255;
         int j = size * 0.0039;
-        if (version == 5 && colorSpace) {
-            size *= 3;
+        if (version == 6 && colorSpace) {
+            j *= 3;
         }
         int i = 0;
         while (i < j) {
             if (i % 2 == 0) {
-                i = getFirstD(i, p);
-                p[i]--;
+                dark = getFirstD(dark, p);
+                p[dark]--;
                 i++;
                 continue;
             }
-            i = getFirstB(i, p);
-            p[i]--;
+            bright = getFirstB(bright, p);
+            p[bright]--;
             i++;
 
         }
@@ -176,14 +177,14 @@ SMinMax CImage::getDarkestAndBrightest(bool is0039) {
     return tmp;
 }
 
-int CImage::getFirstD(int i, vector<int> p) {
+int CImage::getFirstD(int i, vector<int> &p) {
     while (p[i] == 0) {
         i++;
     }
     return i;
 }
 
-int CImage::getFirstB(int i, vector<int> p) {
+int CImage::getFirstB(int i, vector<int> &p) {
     while (p[i] == 0) {
         i--;
     }
