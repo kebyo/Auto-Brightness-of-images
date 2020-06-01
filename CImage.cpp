@@ -144,8 +144,6 @@ SMinMax CImage::getDarkestAndBrightest(bool is0039) {
         }
     }
     if (is0039) {
-        int bright = 255;
-        int dark = 0;
         int j = size * 0.0039;
         if (version == 5 && colorSpace) {
             size *= 3;
