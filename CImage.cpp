@@ -33,7 +33,33 @@ CImage::CImage(SInput config) {
     } else {
         throw CExpension("Wrong version of file", f);
     }
-    colorSpace = (config.mode == 0 || config.mode == 2 || config.mode == 4);
+    colorSpace = (config.mode == 0 || config.mode == 2 || config.mode == 4);//False is YCbCr601
+    delete[] buffer;
+    fclose(f);
+}
+
+void CImage::writeToFile(char *fileName) {
+    FILE *f = fopen(fileName, "wb");
+    if (!f) {
+        throw CExpension("Input file didn't open");
+    }
+    fprintf(f, "P%i\n%i %i\n%i\n", version, width, height, max_val);
+    unsigned char *buffer;
+    if (version == 5) {
+        buffer = new unsigned char[size];
+        for (int i = 0; i < size; i++) {
+            buffer[i] = (unsigned char) pix[i].red;
+        }
+        fwrite(buffer, sizeof(unsigned char), size, f);
+    } else {
+        buffer = new unsigned char[size * 3];
+        for (int i = 0, j = 0; i < size * 3; i += 3, j++) {
+            buffer[i] = (unsigned char) pix[j].red;
+            buffer[i + 1] = (unsigned char) pix[j].green;
+            buffer[i + 2] = (unsigned char) pix[j].blue;
+        }
+        fwrite(buffer, sizeof(unsigned char), size * 3, f);
+    }
     delete[] buffer;
     fclose(f);
 }
@@ -80,7 +106,7 @@ void CImage::autoMode(SInput config) {
         min = getMin();
         max = getMax();
     }
-    std::cout << min << " " << 255.0 * (max - min) << "\n";
+    std::cout << min << " " << 255.0 / (max - min) << "\n";
     if (version == 5) {
         for (int i = 0; i < size; i++) {
             int newValue = cut((pix[i].red - min) * 255.0 / (max - min));

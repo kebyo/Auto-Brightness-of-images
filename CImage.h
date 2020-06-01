@@ -28,6 +28,7 @@ public:
 
     void settingUpOfBrightntess(SInput config);
 
+    void writeToFile(char *fileName);
 
 private:
     FILE *file;
