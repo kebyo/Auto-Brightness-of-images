@@ -4,16 +4,36 @@
 
 #ifndef UNTITLED5_CIMAGE_H
 #define UNTITLED5_CIMAGE_H
+
+#include <iostream>
+#include "CException.h"
+
 struct SInput {
     char *inputName;
     char *outputName;
     int mode;
     int offset;
-    double factor;
+    double multiplier;
+};
+
+struct RGB {
+    double red;
+    double green;
+    double blue;
 };
 
 class CImage {
+public:
+    CImage(SInput config);
 
+private:
+    FILE *file;
+    int version;
+    int width;
+    int height;
+    int max_val;
+    int size;
+    RGB *pix;
 };
 
 
