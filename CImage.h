@@ -39,7 +39,6 @@ public:
     void writeToFile(char *fileName);
 
 private:
-    FILE *file;
     int version;
     int width;
     int height;
