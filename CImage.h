@@ -48,9 +48,9 @@ private:
     RGB *pix;
     bool colorSpace;
 
-    int getFirstD(int  i, vector<int> &p);
+    int getFirstD(int i, vector<int> &p);
 
-    int getFirstB(int  i, vector<int> &p);
+    int getFirstB(int i, vector<int> &p);
 
     void userMode(double offset, double multilier);
 
@@ -59,6 +59,10 @@ private:
     double cut(double x);
 
     SMinMax getDarkestAndBrightest(bool is0039);
+
+    int getDarkest(bool is0039);
+
+    int getBrighest(bool is0039);
 };
 
 

@@ -135,43 +135,38 @@ SMinMax CImage::getDarkestAndBrightest(bool is0039) {
     tmp.min = 0;
     tmp.max = 255;
     for (int i = 0; i < size; i++) {
+        p[pix[i].red]++;
         if (version == 6 && colorSpace) {
-            p[pix[i].red]++;
             p[pix[i].green]++;
             p[pix[i].blue]++;
-        } else {
-            p[pix[i].red]++;
         }
     }
     if (is0039) {
-        int bright = 0, dark = 255;
         int j = size * 0.0039;
-        if (version == 6 && colorSpace) {
-            j *= 3;
-        }
+        j = version == 6 && colorSpace ? j * 3 : j;
         int i = 0;
+        int bright = 255, dark = 0;
         while (i < j) {
-            if (i % 2 == 0) {
+            if (i % 2) {
+                bright = getFirstB(bright, p);
+                p[bright]--;
+                i++;
+            } else {
                 dark = getFirstD(dark, p);
                 p[dark]--;
                 i++;
-                continue;
             }
-            bright = getFirstB(bright, p);
-            p[bright]--;
-            i++;
-
         }
-        bool flagB = false, flagD = false;
-        for (int i = 0; i < p.size(); i++) {
-            if (p[i] > 0 && !flagD) {
-                tmp.min = i;
-                flagD = true;
-            }
-            if (p[255 - i] > 0 && !flagB) {
-                tmp.max = 255 - i;
-                flagB = true;
-            }
+    }
+    bool flagB = false, flagD = false;
+    for (int i = 0; i < p.size(); i++) {
+        if (p[i] > 0 && !flagD) {
+            tmp.min = i;
+            flagD = true;
+        }
+        if (p[255 - i] > 0 && !flagB) {
+            tmp.max = 255 - i;
+            flagB = true;
         }
     }
     return tmp;
