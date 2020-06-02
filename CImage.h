@@ -59,10 +59,6 @@ private:
     double cut(double x);
 
     SMinMax getDarkestAndBrightest(bool is0039);
-
-    int getDarkest(bool is0039);
-
-    int getBrighest(bool is0039);
 };
 
 
