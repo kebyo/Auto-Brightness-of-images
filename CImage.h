@@ -59,6 +59,10 @@ private:
     double cut(double x);
 
     SMinMax getDarkestAndBrightest(bool is0039);
+
+    void RGBtoYCbCr601();
+
+    void YCbCr601toRGB();
 };
 
 

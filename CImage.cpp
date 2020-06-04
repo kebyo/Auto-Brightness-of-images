@@ -66,15 +66,7 @@ void CImage::writeToFile(char *fileName) {
 
 void CImage::settingUpOfBrightntess(SInput config) {
     if (config.mode % 2 != 0) {
-        double kr = 0.299;
-        double kb = 0.114;
-        for (int i = 0; i < size; i++) {
-            double r = pix[i].red;
-            double g = pix[i].green;
-            double b = pix[i].blue;
-            double y = kr * r + (1 - kr - kb) * g + kb * b;
-            pix[i].red = y * 255.0;
-        }
+        RGBtoYCbCr601();
     }
     if (config.mode == 0 || config.mode == 1) {
         userMode(config.offset, config.multiplier);
@@ -82,17 +74,7 @@ void CImage::settingUpOfBrightntess(SInput config) {
         autoMode(config);
     }
     if (config.mode % 2 != 0) {
-        double kr = 0.299;
-        double kb = 0.114;
-        for (int i = 0; i < size; i++) {
-            double y = pix[i].red;
-            double pb = pix[i].green;
-            double pr = pix[i].blue;
-            double r = 2 * pr * (1 - kr) + y;
-            r = r < 0 ? 0 : r;
-            r = r > 1 ? 1 : r;
-            pix[i].red = r * 255.0;
-        }
+        YCbCr601toRGB();
     }
 }
 
@@ -171,15 +153,11 @@ SMinMax CImage::getDarkestAndBrightest(bool is0039) {
         int i = 0;
         int bright = 255, dark = 0;
         while (i < j) {
-            if (i % 2) {
-                bright = getFirstB(bright, p);
-                p[bright]--;
-                i++;
-            } else {
-                dark = getFirstD(dark, p);
-                p[dark]--;
-                i++;
-            }
+            bright = getFirstB(bright, p);
+            p[bright]--;
+            dark = getFirstD(dark, p);
+            p[dark]--;
+            i++;
         }
     }
     bool flagB = false, flagD = false;
@@ -214,4 +192,41 @@ double CImage::cut(double x) {
     x = x > 255.0 ? 255.0 : x;
     x = x < 0.0 ? 0.0 : x;
     return x;
+}
+
+void CImage::YCbCr601toRGB() {
+    double kr = 0.299, kb = 0.114;
+    for (int i = 0; i < size; i++) {
+        double y = pix[i].red / 255.0;
+        double pb = pix[i].green / 255.0 - 0.5;
+        double pr = pix[i].blue / 255.0 - 0.5;
+        double r, g, b;
+        b = 2 * pb * (1 - kb) + y;
+        r = 2 * pr * (1 - kr) + y;
+        g = (y - kr * r - kb * b) / (1 - kr - kb);
+        r = r < 0 ? 0 : r;
+        r = r > 1 ? 1 : r;
+        b = b < 0 ? 0 : b;
+        b = b > 1 ? 1 : b;
+        g = g < 0 ? 0 : g;
+        g = g > 1 ? 1 : g;
+        pix[i].red = r * 255.0;
+        pix[i].green = g * 255.0;
+        pix[i].blue = b * 255.0;
+    }
+}
+
+void CImage::RGBtoYCbCr601() {
+    double kr = 0.299, kb = 0.114;
+    for (int i = 0; i < size; i++) {
+        double r = pix[i].red / 255.0;
+        double g = pix[i].green / 255.0;
+        double b = pix[i].blue / 255.0;
+        double y = kr * r + (1 - kr - kb) * g + kb * b;
+        double pb = 0.5 * (b - y) / (1.0 - kb);
+        double pr = 0.5 * (r - y) / (1.0 - kr);
+        pix[i].red = y * 255.0;
+        pix[i].green = (pb + 0.5) * 255.0;
+        pix[i].blue = (pr + 0.5) * 255.0;
+    }
 }
