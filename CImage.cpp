@@ -65,10 +65,34 @@ void CImage::writeToFile(char *fileName) {
 }
 
 void CImage::settingUpOfBrightntess(SInput config) {
+    if (config.mode % 2 != 0) {
+        double kr = 0.299;
+        double kb = 0.114;
+        for (int i = 0; i < size; i++) {
+            double r = pix[i].red;
+            double g = pix[i].green;
+            double b = pix[i].blue;
+            double y = kr * r + (1 - kr - kb) * g + kb * b;
+            pix[i].red = y * 255.0;
+        }
+    }
     if (config.mode == 0 || config.mode == 1) {
         userMode(config.offset, config.multiplier);
     } else {
         autoMode(config);
+    }
+    if (config.mode % 2 != 0) {
+        double kr = 0.299;
+        double kb = 0.114;
+        for (int i = 0; i < size; i++) {
+            double y = pix[i].red;
+            double pb = pix[i].green;
+            double pr = pix[i].blue;
+            double r = 2 * pr * (1 - kr) + y;
+            r = r < 0 ? 0 : r;
+            r = r > 1 ? 1 : r;
+            pix[i].red = r * 255.0;
+        }
     }
 }
 
