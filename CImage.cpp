@@ -1,7 +1,3 @@
-//
-// Created by ssiie on 01.06.2020.
-//
-
 #include "CImage.h"
 
 CImage::CImage(SInput config) {
@@ -79,7 +75,7 @@ void CImage::settingUpOfBrightntess(SInput config) {
 }
 
 void CImage::userMode(double offset, double multilier) {
-    if (version == 5) {
+    if (version == 5 && colorSpace) {
         for (int i = 0; i < size; i++) {
             int newValue = cut((pix[i].red - offset) * multilier);
             pix[i].red = newValue;
@@ -109,7 +105,7 @@ void CImage::autoMode(SInput config) {
     SMinMax tmp;
     tmp = getDarkestAndBrightest(config.mode == 4 || config.mode == 5);
     std::cout << tmp.min << " " << 255.0 / (tmp.max - tmp.min) << "\n";
-    if (version == 5) {
+    if (version == 5 && colorSpace) {
         for (int i = 0; i < size; i++) {
             int newValue = cut((pix[i].red - tmp.min) * 255.0 / (tmp.max - tmp.min));
             pix[i].red = newValue;
